@@ -4,30 +4,37 @@ import SeasonDisplay from './SeasonDisplay'
 
 class App extends React.Component {
 
-  state = {
-    lat: false,
-    errorMessage: false,
-    isLoading: false
-  }
-
-  componentDidMount() {
-    if (!this.state.errorMessage && !this.state.lat) {
-      this.setState({isLoading: true})
+    state = {
+        coordinates: false,
+        errorMessage: false,
+        isLoading: false
     }
 
-    window.navigator.geolocation.getCurrentPosition(
-      (position) => this.setState({lat: position.coords.latitude, long: position.coords.longitude, isLoading: false}),
-      (err) => this.setState({errorMessage: err.message})
-    )
-  }
+    componentDidMount() {
+        if (!this.state.errorMessage && !this.state.coordinates) {
+            this.setState({isLoading: true})
+        }
 
-  // TODO: only want to display line 27 OR line 28, alter this conditional.
-  render() {
-    return <div>
-      {this.state.errorMessage ? ('Error: ' + this.state.errorMessage) : <SeasonDisplay/>}
-      {this.state.isLoading ? 'Loading' : null}
-    </div>
-  }
+        window.navigator.geolocation.getCurrentPosition(
+            (position) => this.setState({
+                coordinates: true,
+                lat: position.coords.latitude,
+                long: position.coords.longitude,
+                isLoading: false
+            }),
+            (err) => this.setState({errorMessage: err.message})
+        )
+    }
+
+    renderErrorOrLoading = () => {
+        return !this.state.errorMessage ? 'loading' : `Error: $this.state.errorMessage`
+    }
+
+    render() {
+        return <div>
+            {this.state.coordinates ? <SeasonDisplay/> : this.renderErrorOrLoading()}
+        </div>
+    }
 }
 
 ReactDOM.render(<App/>, document.querySelector('#root'))
